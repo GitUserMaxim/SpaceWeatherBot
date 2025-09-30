@@ -2,6 +2,9 @@
 
 namespace App\Commands;
 
+use App\CommandInterface;
+use App\Telegram;
+
 class StartCommand implements CommandInterface {
 
     public function getTrigger(): string {

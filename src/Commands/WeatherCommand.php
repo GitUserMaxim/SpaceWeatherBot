@@ -2,6 +2,10 @@
 
 namespace App\Commands;
 
+use App\CommandInterface;
+use App\Telegram;
+use App\Weather;
+
 class WeatherCommand implements CommandInterface {
 
     private Weather $weather;

@@ -3,6 +3,7 @@
 namespace App;
 
 class Bot {
+    
     private Telegram $telegram;
 
     /** @var CommandInterface[] */
@@ -33,7 +34,7 @@ class Bot {
 
                 $command->execute($chatId, $this->telegram);
                 return;
-                
+
             }
         }
 
