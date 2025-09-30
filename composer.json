@@ -1,0 +1,16 @@
+{
+    "name": "maxim/space-weather-bot",
+    "description": "TGBot",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Maxim",
+            "email": "raychukmaxim@gmail.com"
+        }
+    ],
+    "require": {}
+}
