@@ -4,6 +4,7 @@ namespace App\Commands;
 
 use App\CommandInterface;
 use App\Telegram;
+use App\Storm;
 
 class StormCommand implements CommandInterface {
 
