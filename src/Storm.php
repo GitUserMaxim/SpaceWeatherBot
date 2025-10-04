@@ -27,31 +27,31 @@ class Storm {
         $data = @file_get_contents($url);
 
         if ($data === false) {
-            error_log("Storm: failed to fetch data from NOAA");
             return "❌ Не удалось получить данные о магнитной активности.";
         }
 
         $json = json_decode($data, true);
-        if (!is_array($json) || count($json) === 0) {
-            error_log("Storm: invalid JSON received");
-            return "❌ Не удалось обработать данные о магнитной активности.";
+
+        if (is_array($json) && count($json) > 0) {
+            $lastEntry = end($json);
+            $kIndex = $lastEntry['kp_index'] ?? null;
+            $timeTag = $lastEntry['time_tag'] ?? null;
+
+            if (!$kIndex || !$timeTag) {
+                return "❌ Нет актуальных данных о магнитной активности.";
+            }
+
+            $date = new \DateTime($timeTag, new \DateTimeZone('UTC'));
+            $date->setTimezone(new \DateTimeZone('Europe/Moscow'));
+            $formattedTime = $date->format("H:i:s d.m.Y");
+
+            if ($kIndex >= 5) {
+                return "⚠️ Сейчас наблюдается магнитная буря!\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime.";
+            } else {
+                return "✅ Магнитной бури нет.\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime.";
+            }
         }
 
-        $lastEntry = end($json);
-        $kIndex = $lastEntry['kp_index'] ?? null;
-        $timeTag = $lastEntry['time_tag'] ?? null;
-
-        if (!$kIndex || !$timeTag) {
-            error_log("Storm: missing expected keys in JSON");
-            return "❌ Нет актуальных данных о магнитной активности.";
-        }
-
-        $date = new DateTime($timeTag, new DateTimeZone('UTC'));
-        $date->setTimezone(new DateTimeZone('Europe/Moscow'));
-        $formattedTime = $date->format("H:i:s d.m.Y");
-
-        return $kIndex >= 5
-            ? "⚠️ Сейчас наблюдается магнитная буря!\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime."
-            : "✅ Магнитной бури нет.\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime.";
+        return "❌ Не удалось обработать данные о магнитной активности.";
 }
 }
