@@ -24,17 +24,34 @@ class Bot {
 
     public function handleUpdate(array $update): void {
 
-        if (!isset($update['message'])) return;
-        $chatId = $update['message']['chat']['id'];
-        $text = $update['message']['text'];
+        // if (!isset($update['message'])) return;
+        // $chatId = $update['message']['chat']['id'];
+        // $text = $update['message']['text'];
+
+        // foreach ($this->commands as $command) {
+
+        //     if (strpos($text, $command->getTrigger()) !== false) {
+
+        //         $command->execute($chatId, $this->telegram);
+        //         return;
+            if (!$update || !isset($update['message'])) {
+            http_response_code(200);
+            echo 'No update';
+            return;
+        }
+
+        $chatId = $update['message']['chat']['id'] ?? null;
+        $text = trim($update['message']['text'] ?? '');
+
+        if (!$chatId || !$text) {
+            return;
+        }
 
         foreach ($this->commands as $command) {
-
-            if (strpos($text, $command->getTrigger()) !== false) {
-
+            // поддерживаем и /storm, и /storm@SunActivityBot
+            if (str_starts_with($text, $command->getTrigger())) {
                 $command->execute($chatId, $this->telegram);
                 return;
-
             }
         }
 
