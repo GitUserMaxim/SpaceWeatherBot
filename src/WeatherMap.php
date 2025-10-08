@@ -14,7 +14,7 @@ class WeatherMap
         $this->city = $city;
     }
 
-    public function getCurrent(): string
+    public function getCurrentMap(): string
     {
         $url = "https://api.openweathermap.org/data/2.5/weather?q={$this->city}&appid={$this->apiKey}&units=metric&lang=ru";
         $data = @file_get_contents($url);

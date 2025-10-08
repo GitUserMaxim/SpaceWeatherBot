@@ -27,7 +27,7 @@ class WeatherMapCommand implements CommandInterface
     public function execute(int $chatId, Telegram $telegram): void
     {
 
-        $telegram->sendMessage($chatId, $this->weatherMap->getCurrent());
+        $telegram->sendMessage($chatId, $this->weatherMap->getCurrentMap());
 
     }
 }
