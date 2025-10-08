@@ -55,7 +55,8 @@ class Weather
         $isDay = $w['is_day'] ? 'День' : 'Ночь';
         $wind = $this->getWindDescription($w['windspeed_10m'], $w['winddirection_10m']);
 
-        return "🌦 Погода в Москве:
+        return "🌦 Open-Meteo:
+🌦 Погода в Москве:
 🌡 Температура: {$w['temperature_2m']}°C
 ☁ Облачность: {$w['cloudcover']}%
 💨 Ветер: {$wind}
