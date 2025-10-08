@@ -6,6 +6,7 @@ use App\Bot;
 use App\Commands\StartCommand;
 use App\Commands\StormCommand;
 use App\Commands\WeatherCommand;
+use App\Commands\WeatherMapCommand;
 use App\Storm;
 use App\Telegram;
 use App\Weather;
