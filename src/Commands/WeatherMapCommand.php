@@ -20,7 +20,7 @@ class WeatherMapCommand implements CommandInterface
     public function getTrigger(): string
     {
 
-        return '/weather';
+        return '/weathermap';
 
     }
 
