@@ -25,17 +25,6 @@ class Bot
 
     public function handleUpdate(array $update): void
     {
-
-        // if (!isset($update['message'])) return;
-        // $chatId = $update['message']['chat']['id'];
-        // $text = $update['message']['text'];
-
-        // foreach ($this->commands as $command) {
-
-        //     if (strpos($text, $command->getTrigger()) !== false) {
-
-        //         $command->execute($chatId, $this->telegram);
-        //         return;
         if (! $update || ! isset($update['message'])) {
             http_response_code(200);
             echo 'No update';

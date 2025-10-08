@@ -17,8 +17,9 @@ class StartCommand implements CommandInterface
     public function execute(int $chatId, Telegram $telegram): void
     {
 
-        $telegram->sendMessage($chatId, 'Привет! Я бот, который сообщает:        
+        $telegram->sendMessage($chatId, 'Привет! Я бот, могу подсказать:        
 - 🌍 Магнитную активность — /storm
-- 🌦 Текущую погоду в Москве — /weather');
+- 🌦 Погоду в Москве (open-meteo) — /weather
+- 🌦 Погоду в Москве (OpenWeatherMap) — /weatherMap');
     }
 }
