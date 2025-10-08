@@ -2,8 +2,10 @@
 
 namespace App;
 
-class Storm {
-    public function getStatus(): string {
+class Storm
+{
+    public function getStatus(): string
+    {
         // $url = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json";
         // $data = file_get_contents($url);
         // $json = json_decode($data, true);
@@ -23,11 +25,11 @@ class Storm {
         // return $kIndex >= 5
         //     ? "⚠️ Сейчас наблюдается магнитная буря!\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime."
         //     : "✅ Магнитной бури нет.\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime.";
-        $url = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json";
+        $url = 'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json';
         $data = @file_get_contents($url);
 
         if ($data === false) {
-            return "❌ Не удалось получить данные о магнитной активности.";
+            return '❌ Не удалось получить данные о магнитной активности.';
         }
 
         $json = json_decode($data, true);
@@ -37,13 +39,13 @@ class Storm {
             $kIndex = $lastEntry['kp_index'] ?? null;
             $timeTag = $lastEntry['time_tag'] ?? null;
 
-            if (!$kIndex || !$timeTag) {
-                return "❌ Нет актуальных данных о магнитной активности.";
+            if (! $kIndex || ! $timeTag) {
+                return '❌ Нет актуальных данных о магнитной активности.';
             }
 
             $date = new \DateTime($timeTag, new \DateTimeZone('UTC'));
             $date->setTimezone(new \DateTimeZone('Europe/Moscow'));
-            $formattedTime = $date->format("H:i:s d.m.Y");
+            $formattedTime = $date->format('H:i:s d.m.Y');
 
             if ($kIndex >= 5) {
                 return "⚠️ Сейчас наблюдается магнитная буря!\nУровень K-индекса: $kIndex\nВремя МСК: $formattedTime.";
@@ -52,6 +54,6 @@ class Storm {
             }
         }
 
-        return "❌ Не удалось обработать данные о магнитной активности.";
-}
+        return '❌ Не удалось обработать данные о магнитной активности.';
+    }
 }

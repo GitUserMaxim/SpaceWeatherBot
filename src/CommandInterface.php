@@ -2,10 +2,9 @@
 
 namespace App;
 
-interface CommandInterface {
-
+interface CommandInterface
+{
     public function getTrigger(): string;
-    
-    public function execute(int $chatId, Telegram $telegram): void;
 
+    public function execute(int $chatId, Telegram $telegram): void;
 }

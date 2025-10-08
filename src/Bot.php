@@ -2,27 +2,29 @@
 
 namespace App;
 
-class Bot {
-    
+class Bot
+{
     private Telegram $telegram;
 
     /** @var CommandInterface[] */
-
     private array $commands = [];
 
-    public function __construct(Telegram $telegram) {
+    public function __construct(Telegram $telegram)
+    {
 
         $this->telegram = $telegram;
 
     }
 
-    public function registerCommand(CommandInterface $command): void {
+    public function registerCommand(CommandInterface $command): void
+    {
 
         $this->commands[] = $command;
 
     }
 
-    public function handleUpdate(array $update): void {
+    public function handleUpdate(array $update): void
+    {
 
         // if (!isset($update['message'])) return;
         // $chatId = $update['message']['chat']['id'];
@@ -34,16 +36,17 @@ class Bot {
 
         //         $command->execute($chatId, $this->telegram);
         //         return;
-            if (!$update || !isset($update['message'])) {
+        if (! $update || ! isset($update['message'])) {
             http_response_code(200);
             echo 'No update';
+
             return;
         }
 
         $chatId = $update['message']['chat']['id'] ?? null;
         $text = trim($update['message']['text'] ?? '');
 
-        if (!$chatId || !$text) {
+        if (! $chatId || ! $text) {
             return;
         }
 
@@ -51,6 +54,7 @@ class Bot {
             // поддерживаем и /storm, и /storm@SunActivityBot
             if (str_starts_with($text, $command->getTrigger())) {
                 $command->execute($chatId, $this->telegram);
+
                 return;
             }
         }

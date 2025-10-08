@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'telegram_token' => getenv('TELEGRAM_BOT_TOKEN'),
     'moscow' => [

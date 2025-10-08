@@ -6,23 +6,26 @@ use App\CommandInterface;
 use App\Telegram;
 use App\Weather;
 
-class WeatherCommand implements CommandInterface {
-
+class WeatherCommand implements CommandInterface
+{
     private Weather $weather;
 
-    public function __construct(Weather $weather) {
+    public function __construct(Weather $weather)
+    {
 
         $this->weather = $weather;
 
     }
 
-    public function getTrigger(): string {
+    public function getTrigger(): string
+    {
 
         return '/weather';
 
     }
 
-    public function execute(int $chatId, Telegram $telegram): void {
+    public function execute(int $chatId, Telegram $telegram): void
+    {
 
         $telegram->sendMessage($chatId, $this->weather->getCurrent());
 

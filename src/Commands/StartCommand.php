@@ -5,18 +5,20 @@ namespace App\Commands;
 use App\CommandInterface;
 use App\Telegram;
 
-class StartCommand implements CommandInterface {
-
-    public function getTrigger(): string {
+class StartCommand implements CommandInterface
+{
+    public function getTrigger(): string
+    {
 
         return '/start';
 
     }
 
-    public function execute(int $chatId, Telegram $telegram): void {
+    public function execute(int $chatId, Telegram $telegram): void
+    {
 
-        $telegram->sendMessage($chatId, "Привет! Я бот, который сообщает:        
+        $telegram->sendMessage($chatId, 'Привет! Я бот, который сообщает:        
 - 🌍 Магнитную активность — /storm
-- 🌦 Текущую погоду в Москве — /weather");
+- 🌦 Текущую погоду в Москве — /weather');
     }
 }
