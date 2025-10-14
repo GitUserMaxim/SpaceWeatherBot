@@ -19,11 +19,11 @@ class Weather
 
     public function getCurrent(): string
     {
-        $url = "https://api.open-meteo.com/v1/forecast?"
-             . "latitude={$this->latitude}&longitude={$this->longitude}"
-             . "&current=temperature_2m,weathercode,cloudcover,windspeed_10m,"
-             . "winddirection_10m,precipitation,rain,snowfall,is_day,surface_pressure"
-             . "&timezone=" . urlencode($this->timezone);
+        $url = 'https://api.open-meteo.com/v1/forecast?'
+             ."latitude={$this->latitude}&longitude={$this->longitude}"
+             .'&current=temperature_2m,weathercode,cloudcover,windspeed_10m,'
+             .'winddirection_10m,precipitation,rain,snowfall,is_day,surface_pressure'
+             .'&timezone='.urlencode($this->timezone);
         $data = @file_get_contents($url);
 
         if ($data === false) {

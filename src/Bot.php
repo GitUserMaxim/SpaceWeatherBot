@@ -40,14 +40,13 @@ class Bot
         }
 
         foreach ($this->commands as $command) {
-            // поддерживаем и /storm, и /storm@SunActivityBot
-            if (str_starts_with($text, $command->getTrigger())) {
+            if ($text === $command->getTrigger()) {
                 $command->execute($chatId, $this->telegram);
 
                 return;
             }
-        }
 
-        $this->telegram->sendMessage($chatId, "Команда не распознана. Доступные команды:\n/storm — Магнитная буря\n/weather — Погода");
+            $this->telegram->sendMessage($chatId, "Команда не распознана. Доступные команды:\n/storm — Магнитная буря\n/weather — Погода");
+        }
     }
 }
