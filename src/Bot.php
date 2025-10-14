@@ -11,21 +11,17 @@ class Bot
 
     public function __construct(Telegram $telegram)
     {
-
         $this->telegram = $telegram;
-
     }
 
     public function registerCommand(CommandInterface $command): void
     {
-
         $this->commands[] = $command;
-
     }
 
     public function handleUpdate(array $update): void
     {
-        if (! $update || ! isset($update['message'])) {
+        if (! isset($update['message'])) {
             http_response_code(200);
             echo 'No update';
 
@@ -35,7 +31,7 @@ class Bot
         $chatId = $update['message']['chat']['id'] ?? null;
         $text = trim($update['message']['text'] ?? '');
 
-        if (! $chatId || ! $text) {
+        if (! $chatId || $text === '') {
             return;
         }
 
@@ -45,8 +41,14 @@ class Bot
 
                 return;
             }
-
-            $this->telegram->sendMessage($chatId, "Команда не распознана. Доступные команды:\n/storm — Магнитная буря\n/weather — Погода");
         }
+
+        $this->telegram->sendMessage(
+            $chatId,
+            "Команда не распознана. Доступные команды:\n"
+            ."/storm — Магнитная буря\n"
+            ."/weather — Погода в Москве (open-meteo)\n"
+            .'/weathermap — Погода в Москве (OpenWeatherMap)'
+        );
     }
 }
