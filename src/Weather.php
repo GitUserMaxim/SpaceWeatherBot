@@ -19,7 +19,11 @@ class Weather
 
     public function getCurrent(): string
     {
-        $url = "https://api.open-meteo.com/v1/forecast?latitude={$this->latitude}&longitude={$this->longitude}&current=temperature_2m,weathercode,cloudcover,windspeed_10m,winddirection_10m,precipitation,rain,snowfall,is_day&timezone=".urlencode($this->timezone);
+        $url = "https://api.open-meteo.com/v1/forecast?"
+             . "latitude={$this->latitude}&longitude={$this->longitude}"
+             . "&current=temperature_2m,weathercode,cloudcover,windspeed_10m,"
+             . "winddirection_10m,precipitation,rain,snowfall,is_day,surface_pressure"
+             . "&timezone=" . urlencode($this->timezone);
         $data = @file_get_contents($url);
 
         if ($data === false) {
@@ -55,9 +59,14 @@ class Weather
         $isDay = $w['is_day'] ? 'День' : 'Ночь';
         $wind = $this->getWindDescription($w['windspeed_10m'], $w['winddirection_10m']);
 
+        $pressure = isset($w['surface_pressure'])
+            ? round($w['surface_pressure'] * 0.75006)
+            : 'нет данных';
+
         return "🌦 Open-Meteo:
 🌦 Погода в Москве:
 🌡 Температура: {$w['temperature_2m']}°C
+📉 Давление: {$pressure} мм рт. ст.
 ☁ Облачность: {$w['cloudcover']}%
 💨 Ветер: {$wind}
 🌧 Осадки: {$w['precipitation']} мм (дождь: {$w['rain']} мм, снег: {$w['snowfall']} мм)
