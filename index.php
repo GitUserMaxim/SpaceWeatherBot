@@ -19,8 +19,10 @@ $storm = new Storm;
 $weather = new Weather($config['moscow']['latitude'], $config['moscow']['longitude'], $config['moscow']['timezone']);
 $weatherMap = new WeatherMap(
     $config['openweather']['api_key'],
-    $config['openweather']['city']
+    $config['moscow']['latitude'],
+    $config['moscow']['longitude']
 );
+
 $bot = new Bot($telegram);
 
 // Регистрируем команды
