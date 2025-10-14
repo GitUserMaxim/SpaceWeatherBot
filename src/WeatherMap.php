@@ -6,17 +6,20 @@ class WeatherMap
 {
     private string $apiKey;
 
-    private string $city;
+    private float $lat;
 
-    public function __construct(string $apiKey, string $city = 'Moscow,ru')
+    private float $lon;
+
+    public function __construct(string $apiKey, float $lat, float $lon)
     {
         $this->apiKey = $apiKey;
-        $this->city = $city;
+        $this->lat = $lat;
+        $this->lon = $lon;
     }
 
     public function getCurrentMap(): string
     {
-        $url = "https://api.openweathermap.org/data/2.5/weather?q={$this->city}&appid={$this->apiKey}&units=metric&lang=ru";
+        $url = "https://api.openweathermap.org/data/2.5/weather?lat={$this->lat}&lon={$this->lon}&appid={$this->apiKey}&units=metric&lang=ru";
         $data = @file_get_contents($url);
 
         if ($data === false) {
@@ -31,6 +34,7 @@ class WeatherMap
         $temp = $json['main']['temp'];
         $feelsLike = $json['main']['feels_like'];
         $pressure = $json['main']['pressure'];
+        $pressureMmHg = round($pressure * 0.75006);
         $humidity = $json['main']['humidity'];
         $clouds = $json['clouds']['all'];
         $windSpeed = $json['wind']['speed'] ?? 0;
@@ -38,17 +42,28 @@ class WeatherMap
         $weatherDesc = $json['weather'][0]['description'] ?? 'Неизвестно';
         $rain = $json['rain']['1h'] ?? 0;
         $snow = $json['snow']['1h'] ?? 0;
+        $visibility = ($json['visibility'] ?? 0) / 1000; // км
+        $sunrise = isset($json['sys']['sunrise']) ? date('H:i', $json['sys']['sunrise']) : '—';
+        $sunset = isset($json['sys']['sunset']) ? date('H:i', $json['sys']['sunset']) : '—';
+        $coord = "{$json['coord']['lat']}, {$json['coord']['lon']}";
 
         $wind = $this->getWindDescription($windSpeed, $windDeg);
 
-        return "🌐 OpenWeatherMap:
+        $forecast = $this->getForecast(2); // прогноз на 2 дня
+
+        return "🌐 OpenWeatherMap — текущая погода:
 🌡 Температура: {$temp}°C (ощущается как {$feelsLike}°C)
+📊 Давление: {$pressure} гПа ({$pressureMmHg} мм рт. ст.)
+💧 Влажность: {$humidity}%
 ☁ Облачность: {$clouds}%
 💨 Ветер: {$wind}
 🌧 Осадки: {$rain} мм дождя, {$snow} мм снега
-📊 Давление: {$pressure} гПа
-💧 Влажность: {$humidity}%
-📡 Состояние: {$weatherDesc}";
+👀 Видимость: {$visibility} км
+🌅 Восход: {$sunrise}, Закат: {$sunset}
+📡 Состояние: {$weatherDesc}
+📍 Координаты: {$coord}
+
+{$forecast}";
     }
 
     private function getWindDirection(float $degrees): string
@@ -80,5 +95,33 @@ class WeatherMap
             $speed < 17 => "🌬 сильный {$direction}, {$speed} м/с",
             default => "💨 очень сильный {$direction}, {$speed} м/с",
         };
+    }
+
+    private function getForecast(int $days = 2): string
+    {
+        $url = "https://api.openweathermap.org/data/2.5/forecast?lat={$this->lat}&lon={$this->lon}&appid={$this->apiKey}&units=metric&lang=ru";
+        $data = @file_get_contents($url);
+        $json = json_decode($data, true);
+
+        if (! isset($json['list'])) {
+            return '❌ Не удалось получить прогноз.';
+        }
+
+        $output = "📅 Прогноз на {$days} дня:\n";
+
+        $today = date('Y-m-d');
+        $count = 0;
+
+        foreach ($json['list'] as $item) {
+            $date = substr($item['dt_txt'], 0, 10);
+            if ($date !== $today && $count < $days) {
+                $temp = $item['main']['temp'];
+                $desc = $item['weather'][0]['description'] ?? 'Неизвестно';
+                $output .= "{$date}: {$temp}°C, {$desc}\n";
+                $count++;
+            }
+        }
+
+        return $output;
     }
 }
