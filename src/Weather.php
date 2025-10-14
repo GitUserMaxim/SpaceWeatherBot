@@ -59,14 +59,18 @@ class Weather
         $isDay = $w['is_day'] ? 'День' : 'Ночь';
         $wind = $this->getWindDescription($w['windspeed_10m'], $w['winddirection_10m']);
 
-        $pressure = isset($w['surface_pressure'])
-            ? round($w['surface_pressure'] * 0.75006)
-            : 'нет данных';
+        if (isset($w['surface_pressure'])) {
+            $pressure = round($w['surface_pressure']);
+            $pressureMmHg = round($pressure * 0.75006);
+            $pressureText = "{$pressureMmHg} мм рт. ст. ({$pressure} гПа)";
+        } else {
+            $pressureText = 'нет данных';
+        }
 
         return "🌦 Open-Meteo:
 🌦 Погода в Москве:
 🌡 Температура: {$w['temperature_2m']}°C
-📉 Давление: {$pressure} мм рт. ст.
+📊 Давление: {$pressureText}
 ☁ Облачность: {$w['cloudcover']}%
 💨 Ветер: {$wind}
 🌧 Осадки: {$w['precipitation']} мм (дождь: {$w['rain']} мм, снег: {$w['snowfall']} мм)

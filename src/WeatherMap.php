@@ -51,8 +51,8 @@ class WeatherMap
         $rain = $json['rain']['1h'] ?? 0;
         $snow = $json['snow']['1h'] ?? 0;
         $visibility = ($json['visibility'] ?? 0) / 1000; // км
-        $sunrise = isset($json['sys']['sunrise']) ? date('H:i', $json['sys']['sunrise']) : '—';
-        $sunset = isset($json['sys']['sunset']) ? date('H:i', $json['sys']['sunset']) : '—';
+        $sunrise = isset($json['sys']['sunrise']) ? $this->formatTime($json['sys']['sunrise']) : '—';
+        $sunset = isset($json['sys']['sunset']) ? $this->formatTime($json['sys']['sunset']) : '—';
 
         $wind = $this->getWindDescription($windSpeed, $windDeg);
 
@@ -119,7 +119,7 @@ class WeatherMap
             $grouped[$date][] = $item;
         }
 
-        $today = date('d-m-Y');
+        $today = date('Y-m-d');
         $dates = array_keys($grouped);
         $output = "📅 Прогноз на {$days} дня:\n";
 
