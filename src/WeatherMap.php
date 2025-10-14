@@ -17,6 +17,14 @@ class WeatherMap
         $this->lon = $lon;
     }
 
+    private function formatTime(int $timestamp, string $timezone = 'Europe/Moscow'): string
+    {
+        $dt = new \DateTime("@$timestamp");
+        $dt->setTimezone(new \DateTimeZone($timezone));
+
+        return $dt->format('H:i');
+    }
+
     public function getCurrentMap(): string
     {
         $url = "https://api.openweathermap.org/data/2.5/weather?lat={$this->lat}&lon={$this->lon}&appid={$this->apiKey}&units=metric&lang=ru";
@@ -45,7 +53,6 @@ class WeatherMap
         $visibility = ($json['visibility'] ?? 0) / 1000; // км
         $sunrise = isset($json['sys']['sunrise']) ? date('H:i', $json['sys']['sunrise']) : '—';
         $sunset = isset($json['sys']['sunset']) ? date('H:i', $json['sys']['sunset']) : '—';
-        $coord = "{$json['coord']['lat']}, {$json['coord']['lon']}";
 
         $wind = $this->getWindDescription($windSpeed, $windDeg);
 
@@ -53,7 +60,7 @@ class WeatherMap
 
         return "🌐 OpenWeatherMap — текущая погода:
 🌡 Температура: {$temp}°C (ощущается как {$feelsLike}°C)
-📊 Давление: {$pressure} гПа ({$pressureMmHg} мм рт. ст.)
+📊 Давление: {$pressureMmHg} мм рт. ст. ({$pressure} гПа)
 💧 Влажность: {$humidity}%
 ☁ Облачность: {$clouds}%
 💨 Ветер: {$wind}
@@ -61,7 +68,6 @@ class WeatherMap
 👀 Видимость: {$visibility} км
 🌅 Восход: {$sunrise}, Закат: {$sunset}
 📡 Состояние: {$weatherDesc}
-📍 Координаты: {$coord}
 
 {$forecast}";
     }
@@ -107,19 +113,37 @@ class WeatherMap
             return '❌ Не удалось получить прогноз.';
         }
 
-        $output = "📅 Прогноз на {$days} дня:\n";
-
-        $today = date('Y-m-d');
-        $count = 0;
-
+        $grouped = [];
         foreach ($json['list'] as $item) {
             $date = substr($item['dt_txt'], 0, 10);
-            if ($date !== $today && $count < $days) {
-                $temp = $item['main']['temp'];
-                $desc = $item['weather'][0]['description'] ?? 'Неизвестно';
-                $output .= "{$date}: {$temp}°C, {$desc}\n";
-                $count++;
+            $grouped[$date][] = $item;
+        }
+
+        $today = date('d-m-Y');
+        $dates = array_keys($grouped);
+        $output = "📅 Прогноз на {$days} дня:\n";
+
+        $labels = ['📆 Завтра', '📆 Послезавтра'];
+
+        $shown = 0;
+        foreach ($dates as $date) {
+            if ($date <= $today) {
+                continue;
             }
+            if ($shown >= $days) {
+                break;
+            }
+
+            $items = $grouped[$date];
+            $temps = array_column(array_column($items, 'main'), 'temp');
+            $avgTemp = round(array_sum($temps) / count($temps), 1);
+            $descriptions = array_map(fn ($i) => $i['weather'][0]['description'] ?? '', $items);
+            $commonDesc = array_count_values($descriptions);
+            arsort($commonDesc);
+            $desc = array_key_first($commonDesc);
+
+            $output .= "{$labels[$shown]} ({$date}): {$avgTemp}°C, {$desc}\n";
+            $shown++;
         }
 
         return $output;
