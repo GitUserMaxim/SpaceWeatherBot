@@ -19,13 +19,13 @@ class Weather
 
     public function getCurrent(): string
     {
+        // добавляем relative_humidity_2m и windgusts_10m
         $url = 'https://api.open-meteo.com/v1/forecast?'
              ."latitude={$this->latitude}&longitude={$this->longitude}"
-             .'&current=temperature_2m,apparent_temperature,relative_humidity_2m,'
-             .'weathercode,cloudcover,windspeed_10m,winddirection_10m,wind_gusts_10m,'
-             .'precipitation,rain,snowfall,is_day,surface_pressure,shortwave_radiation_sum'
+             .'&current=temperature_2m,apparent_temperature,weathercode,cloudcover,'
+             .'windspeed_10m,winddirection_10m,windgusts_10m,'
+             .'precipitation,rain,snowfall,relative_humidity_2m,is_day,surface_pressure'
              .'&timezone='.urlencode($this->timezone);
-
         $data = @file_get_contents($url);
 
         if ($data === false) {
@@ -62,7 +62,6 @@ class Weather
         $isDay = $w['is_day'] ? 'День' : 'Ночь';
         $wind = $this->getWindDescription($w['windspeed_10m'], $w['winddirection_10m']);
 
-        // давление
         if (isset($w['surface_pressure'])) {
             $pressure = round($w['surface_pressure']);
             $pressureMmHg = round($pressure * 0.75006);
@@ -71,35 +70,25 @@ class Weather
             $pressureText = 'нет данных';
         }
 
-        // влажность
+        // добавляем влажность и порывы ветра
         $humidityText = isset($w['relative_humidity_2m'])
-            ? "{$w['relative_humidity_2m']} %"
+            ? "{$w['relative_humidity_2m']}%"
             : 'нет данных';
-
-        // ощущаемая температура
-        $apparentTempText = isset($w['apparent_temperature'])
-            ? "{$w['apparent_temperature']}°C (ощущается)"
-            : 'нет данных';
-
-        // радиация
-        $radiationText = isset($w['shortwave_radiation_sum'])
-            ? "{$w['shortwave_radiation_sum']} Вт/м²"
+        $gustsText = isset($w['windgusts_10m'])
+            ? "{$w['windgusts_10m']} км/ч"
             : 'нет данных';
 
         return "🌦 Open-Meteo:
-🌦 Погода в координатах: {$this->latitude}, {$this->longitude}
-🌡 Температура: {$w['temperature_2m']}°C
-🥵 Ощущается как: {$apparentTempText}
-💧 Влажность: {$humidityText}
-📊 Давление: {$pressureText}
-☁ Облачность: {$w['cloudcover']}%
-💨 Ветер: {$wind}
-🎯 Порывы ветра: ".(isset($w['wind_gusts_10m']) ? "{$w['wind_gusts_10m']} км/ч" : 'нет данных')."
-🌧 Осадки: {$w['precipitation']} мм (дождь: {$w['rain']} мм, снег: {$w['snowfall']} мм)
-☀ Сейчас: {$isDay}
-📡 Состояние: {$condition}
-🔆 Коротковолновое излучение: {$radiationText}
-";
+🌦 Погода в локации (lat={$this->latitude}, lon={$this->longitude}):
+🌡 Температура: {$w['temperature_2m']}°C  
+🤧 Ощущается как: {$w['apparent_temperature']}°C  
+💧 Влажность: {$humidityText}  
+📊 Давление: {$pressureText}  
+☁ Облачность: {$w['cloudcover']}%  
+💨 Ветер: {$wind} (порывы: {$gustsText})  
+🌧 Осадки: {$w['precipitation']} мм (дождь: {$w['rain']} мм, снег: {$w['snowfall']} мм)  
+☀ Сейчас: {$isDay}  
+📡 Состояние: {$condition}";
     }
 
     private function getWindDirection(float $degrees): string
