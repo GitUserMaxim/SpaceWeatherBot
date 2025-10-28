@@ -21,9 +21,11 @@ class Weather
     {
         $url = 'https://api.open-meteo.com/v1/forecast?'
              ."latitude={$this->latitude}&longitude={$this->longitude}"
-             .'&current=temperature_2m,weathercode,cloudcover,windspeed_10m,'
-             .'winddirection_10m,precipitation,rain,snowfall,is_day,surface_pressure'
+             .'&current=temperature_2m,apparent_temperature,relative_humidity_2m,'
+             .'weathercode,cloudcover,windspeed_10m,winddirection_10m,wind_gusts_10m,'
+             .'precipitation,rain,snowfall,is_day,surface_pressure,shortwave_radiation_sum'
              .'&timezone='.urlencode($this->timezone);
+
         $data = @file_get_contents($url);
 
         if ($data === false) {
@@ -36,6 +38,7 @@ class Weather
         }
 
         $w = $json['current'];
+
         $conditions = [
             0 => '☀️ Ясно',
             1 => '🌤 Преимущественно ясно',
@@ -59,6 +62,7 @@ class Weather
         $isDay = $w['is_day'] ? 'День' : 'Ночь';
         $wind = $this->getWindDescription($w['windspeed_10m'], $w['winddirection_10m']);
 
+        // давление
         if (isset($w['surface_pressure'])) {
             $pressure = round($w['surface_pressure']);
             $pressureMmHg = round($pressure * 0.75006);
@@ -67,15 +71,35 @@ class Weather
             $pressureText = 'нет данных';
         }
 
+        // влажность
+        $humidityText = isset($w['relative_humidity_2m'])
+            ? "{$w['relative_humidity_2m']} %"
+            : 'нет данных';
+
+        // ощущаемая температура
+        $apparentTempText = isset($w['apparent_temperature'])
+            ? "{$w['apparent_temperature']}°C (ощущается)"
+            : 'нет данных';
+
+        // радиация
+        $radiationText = isset($w['shortwave_radiation_sum'])
+            ? "{$w['shortwave_radiation_sum']} Вт/м²"
+            : 'нет данных';
+
         return "🌦 Open-Meteo:
-🌦 Погода в Москве:
+🌦 Погода в координатах: {$this->latitude}, {$this->longitude}
 🌡 Температура: {$w['temperature_2m']}°C
+🥵 Ощущается как: {$apparentTempText}
+💧 Влажность: {$humidityText}
 📊 Давление: {$pressureText}
 ☁ Облачность: {$w['cloudcover']}%
 💨 Ветер: {$wind}
+🎯 Порывы ветра: ".(isset($w['wind_gusts_10m']) ? "{$w['wind_gusts_10m']} км/ч" : 'нет данных')."
 🌧 Осадки: {$w['precipitation']} мм (дождь: {$w['rain']} мм, снег: {$w['snowfall']} мм)
 ☀ Сейчас: {$isDay}
-📡 Состояние: {$condition}";
+📡 Состояние: {$condition}
+🔆 Коротковолновое излучение: {$radiationText}
+";
     }
 
     private function getWindDirection(float $degrees): string
