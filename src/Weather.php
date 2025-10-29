@@ -79,7 +79,6 @@ class Weather
             : 'нет данных';
 
         return "🌦 Open-Meteo:
-🌦 Погода в локации (lat={$this->latitude}, lon={$this->longitude}):
 🌡 Температура: {$w['temperature_2m']}°C  
 🤧 Ощущается как: {$w['apparent_temperature']}°C  
 💧 Влажность: {$humidityText}  
